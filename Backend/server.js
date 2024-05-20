@@ -1,6 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const fileUpload = require('express-fileupload');
+
+app.use(fileUpload());
 
 // Import DynamoDB configuration
 const dynamoDBClient = require('./config');
@@ -19,6 +22,32 @@ const dynamoDb = DynamoDBDocumentClient.from(dynamoDBClient);
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+app.post('/upload', (req, res) => {
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send('No files were uploaded.');
+  }
+
+  const file = req.files.file;
+  const formData = new FormData();
+  formData.append('file', file.data, file.name);
+
+  axios.post('https://q1ao73u6xl.execute-api.us-east-1.amazonaws.com/deploytest', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+  .then(response => {
+    console.log(response.data);
+    res.send('File uploaded successfully.');
+  })
+  .catch(error => {
+    console.error(error);
+    res.status(500).send('Error uploading file.');
+  });
+});
+
+
 
 // Create a new recipe
 app.post('/recipes', async (req, res) => {
