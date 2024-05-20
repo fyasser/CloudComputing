@@ -9,7 +9,7 @@ const { DynamoDBDocumentClient, ScanCommand, GetCommand, PutCommand, UpdateComma
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 6000;
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -25,7 +25,7 @@ app.post('/recipes', async (req, res) => {
   const { id, title, ingredients, category } = req.body;
   console.log(ingredients)
   const params = {
-    TableName: process.env.DYNAMODB_TABLE,
+    TableName: process.env.DYNAMODB_TABLE_NAME,
     Item: { id, title, ingredients, category },
   };
   try {
@@ -39,7 +39,7 @@ app.post('/recipes', async (req, res) => {
 // Get all recipes
 app.get('/recipes', async (req, res) => {
   const params = {
-    TableName: process.env.DYNAMODB_TABLE,
+    TableName: process.env.DYNAMODB_TABLE_NAME,
   };
   try {
     const data = await dynamoDb.send(new ScanCommand(params));
@@ -53,7 +53,7 @@ app.get('/recipes', async (req, res) => {
 app.get('/recipes/:id', async (req, res) => {
   const { id } = req.params;
   const params = {
-    TableName: process.env.DYNAMODB_TABLE,
+    TableName: process.env.DYNAMODB_TABLE_NAME,
     Key: { id },
   };
   try {
@@ -73,7 +73,7 @@ app.put('/recipes/:id', async (req, res) => {
   const { id } = req.params;
   const { title, ingredients, category } = req.body;
   const params = {
-    TableName: process.env.DYNAMODB_TABLE,
+    TableName: process.env.DYNAMODB_TABLE_NAME,
     Key: { id },
     UpdateExpression: 'set title = :title, ingredients = :ingredients, category = :category',
     ExpressionAttributeValues: {
@@ -95,7 +95,7 @@ app.put('/recipes/:id', async (req, res) => {
 app.delete('/recipes/:id', async (req, res) => {
   const { id } = req.params;
   const params = {
-    TableName: process.env.DYNAMODB_TABLE,
+    TableName: process.env.DYNAMODB_TABLE_NAME,
     Key: { id },
   };
   try {
